@@ -1,10 +1,27 @@
-import { StyleSheet, Text, View } from "react-native";
-
+import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { theme } from "./theme";
 export default function App() {
   return (
     <View style={styles.container}>
+      {/* 
+
+//Using Pressable button
+      <Pressable onPress={ () => console.log("Delee Button Press")}>
+      <Text>Delete</Text>
+      </Pressable> */}
+      {/* Using Touchable Button */}
+
       <View style={styles.itemsContainer}>
+        {/* <Button title="Press Me" /> This is usually not used in production app, because you cannot customize it */}
+
         <Text style={styles.itemText}>Coffee</Text>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => console.log("Delee Button Press")}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.buttonText}>Delete</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -13,21 +30,37 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffff",
+    backgroundColor: theme.colorWhite,
     justifyContent: "center",
   },
 
   itemsContainer: {
     borderBottomWidth: 2,
-    borderBottomColor: "#1a759f",
+    borderBottomColor: theme.colorCerulian,
     borderStyle: "solid",
 
     paddingHorizontal: 8,
     paddingVertical: 16,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
 
   itemText: {
     fontSize: 18,
     fontWeight: "200",
+  },
+
+  button: {
+    backgroundColor: theme.colorBlack,
+    padding: 8,
+    borderRadius: 6,
+  },
+
+  buttonText: {
+    color: theme.colorWhite,
+    fontWeight: "bold",
+    textTransform: "uppercase",
+    letterSpacing: 1,
   },
 });
