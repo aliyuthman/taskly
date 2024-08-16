@@ -1,19 +1,10 @@
-import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
-import { theme } from "../theme";
-import { useRouter } from "expo-router";
+import { Text, View, StyleSheet } from "react-native";
 
 export default function CounterScreen() {
-    // second method to navigate using expo router
-    // third way, is the button navigation that comes automatically on top of each of the screen on the stack
-  const router = useRouter();
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        onPress={() => router.navigate("/idea")}
-        style={styles.button}
-      >
-        <Text style={styles.buttonText}>Go to /Idea</Text>
-      </TouchableOpacity>
+      <Text style={styles.buttonText}>Go to /Idea</Text>
+
       <Text style={styles.text}>Counter</Text>
     </View>
   );
@@ -30,14 +21,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
   },
 
-  button: {
-    alignSelf: "center",
-    marginBottom: 18,
-    backgroundColor: theme.colorOrange,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-  },
   buttonText: {
     fontSize: 24,
     color: "white",

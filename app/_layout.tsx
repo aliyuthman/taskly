@@ -1,21 +1,42 @@
 import { View, Text } from "react-native";
 import React from "react";
-import { Stack } from "expo-router";
+import Feather from "@expo/vector-icons/Feather";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import { Tabs } from "expo-router";
+import { theme } from "../theme";
 
 export default function _layout() {
   return (
-    <Stack>
-      <Stack.Screen name="index" options={{ title: "Shopping List" }} />
-      {/* others screens, except when there's need to add extra properties with stack screens, theres no need to define them here. As these are linked with expo router navigation. For modal screen as well, because we need to use presentation settings, we need to define them */}
-      <Stack.Screen
+    <Tabs screenOptions={{ tabBarActiveTintColor: theme.colorOrange }}>
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Shopping List",
+          tabBarIcon: ({ color, size }) => (
+            <Feather name="list" size={size} color={color} />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
         name="counter"
         options={{
           title: "Counter",
-          presentation: "modal",
-          animation: "slide_from_bottom",
+          tabBarIcon: ({ color, size }) => (
+            <AntDesign name="clockcircleo" size={size} color={color} />
+          ),
         }}
       />
-      <Stack.Screen name="idea" options={{ title: "Idea" }} />
-    </Stack>
+      <Tabs.Screen
+        name="idea"
+        options={{
+          title: "Idea",
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome5 name="lightbulb" size={size} color={color} />
+          ),
+        }}
+      />
+    </Tabs>
   );
 }
