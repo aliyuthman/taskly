@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 
 export default function CounterScreen() {
     // second method to navigate using expo router
+    // third way, is the button navigation that comes automatically on top of each of the screen on the stack
   const router = useRouter();
   return (
     <View style={styles.container}>
