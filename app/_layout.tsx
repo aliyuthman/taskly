@@ -12,7 +12,7 @@ export default function _layout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Shopping List",
+          title: "Grolish",
           tabBarIcon: ({ color, size }) => (
             <Feather name="list" size={size} color={color} />
           ),
@@ -23,6 +23,7 @@ export default function _layout() {
         name="counter"
         options={{
           title: "Counter",
+          headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <AntDesign name="clockcircleo" size={size} color={color} />
           ),
