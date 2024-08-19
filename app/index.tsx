@@ -5,6 +5,7 @@ import {
   Text,
   TextInput,
   FlatList,
+  View,
 } from "react-native";
 import { theme } from "../theme";
 import { ShoppingListItem } from "../components/ShoppingListItem";
@@ -22,8 +23,7 @@ console.log(testData);
 export default function App() {
   const [value, setValue] = useState(""); //useState() function or hook return array of two items, first is the variable you're tracking and the second is the function to call when updating or changing the value of the first item.
 
-  const [shopingListItem, setShopingList] =
-    useState<ShopingListItemType[]>(initialList);
+  const [shopingListItem, setShopingList] = useState<ShopingListItemType[]>([]);
 
   const handleSubmit = () => {
     if (value) {
@@ -38,11 +38,16 @@ export default function App() {
 
   return (
     <FlatList
-      data={testData}
+      data={shopingListItem}
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
       stickyHeaderIndices={[0]}
-      ListHeaderComponent={() => (
+      ListEmptyComponent={
+        <View style={styles.listEmptyContainer}>
+          <Text> Your shopping list is empty</Text>
+        </View>
+      }
+      ListHeaderComponent={
         <>
           <Link href="/counter" asChild>
             <TouchableOpacity style={styles.button}>
@@ -58,7 +63,7 @@ export default function App() {
             onSubmitEditing={handleSubmit}
           />
         </>
-      )}
+      }
       renderItem={({ item }) => {
         console.log(item); //this shows only the rendered item on screen, therefore flatlist optimized the rendering. The rest are truncated while only the visible component are renderedß
         return <ShoppingListItem name={item.name} />;
@@ -99,5 +104,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     borderRadius: 50,
     backgroundColor: theme.colorWhite,
+  },
+  listEmptyContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: 18,
   },
 });
