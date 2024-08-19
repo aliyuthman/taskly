@@ -1,6 +1,7 @@
 export type ShoppingListItemType = {
   id: string;
   name: string;
+  completedAtTimestamp?: number;
 };
 
 export const initialList: ShoppingListItemType[] = [

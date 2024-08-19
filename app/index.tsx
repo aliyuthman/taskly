@@ -23,27 +23,46 @@ console.log(testData);
 export default function App() {
   const [value, setValue] = useState(""); //useState() function or hook return array of two items, first is the variable you're tracking and the second is the function to call when updating or changing the value of the first item.
 
-  const [shopingListItem, setShopingList] = useState<ShopingListItemType[]>([]);
+  const [shoppingListItem, setShoppingList] = useState<ShoppingListItemType[]>(
+    []
+  );
 
   const handleSubmit = () => {
     if (value) {
-      const newShopingList = [
+      const newShoppingList = [
         { id: new Date().toTimeString(), name: value },
-        ...shopingListItem,
+        ...shoppingListItem,
       ];
-      setShopingList(newShopingList);
+      setShoppingList(newShoppingList);
       setValue("");
     }
   };
 
   const handleDelete = (id: string) => {
-    const newShopingList = shopingListItem.filter((item) => item.id !== id);
-    setShopingList(newShopingList);
+    const newShoppingList = shoppingListItem.filter((item) => item.id !== id);
+    setShoppingList(newShoppingList);
+  };
+
+  const handleToggleComplete = (id: string) => {
+    const newShoppingList = shoppingListItem.map((item) => {
+      if (item.id === id) {
+        //TODO
+        return {
+          ...item,
+          completedAtTimestamp: item.completedAtTimestamp
+            ? undefined
+            : Date.now(),
+        };
+      }
+      return item;
+    });
+
+    setShoppingList(newShoppingList);
   };
 
   return (
     <FlatList
-      data={shopingListItem}
+      data={shoppingListItem}
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
       stickyHeaderIndices={[0]}
@@ -75,6 +94,8 @@ export default function App() {
           <ShoppingListItem
             name={item.name}
             onDelete={() => handleDelete(item.id)}
+            isCompleted={Boolean(item.completedAtTimestamp)}
+            onToggleComplete={() => handleToggleComplete(item.id)}
           />
         );
       }}
