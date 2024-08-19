@@ -1,6 +1,6 @@
-import { View, Text } from "react-native";
+import { View, Text, Image } from "react-native";
 import React from "react";
-import Feather from "@expo/vector-icons/Feather";
+import grolishIcon from "../assets/grolish-logo.png";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { Tabs } from "expo-router";
@@ -13,8 +13,11 @@ export default function _layout() {
         name="index"
         options={{
           title: "Grolish",
-          tabBarIcon: ({ color, size }) => (
-            <Feather name="list" size={size} color={color} />
+          tabBarIcon: ({ color }) => (
+            <Image
+              source={grolishIcon}
+              style={{ width: 32, height: 32, tintColor: color }}
+            />
           ),
         }}
       />
