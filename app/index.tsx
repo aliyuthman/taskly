@@ -11,7 +11,8 @@ import { theme } from "../theme";
 import { ShoppingListItem } from "../components/ShoppingListItem";
 import { Link } from "expo-router";
 import { useState } from "react";
-import { initialList } from "./initialData";
+import { initialList, ShoppingListItemType } from "./initialData";
+import { orderShoppingList } from "./utils";
 
 // larger listings >> 999
 const testData = new Array(1000)
@@ -23,16 +24,19 @@ console.log(testData);
 export default function App() {
   const [value, setValue] = useState(""); //useState() function or hook return array of two items, first is the variable you're tracking and the second is the function to call when updating or changing the value of the first item.
 
-  const [shoppingListItem, setShoppingList] = useState<ShoppingListItemType[]>(
-    []
-  );
+  const [shoppingListItem, setShoppingList] =
+    useState<ShoppingListItemType[]>(initialList);
 
   const handleSubmit = () => {
     if (value) {
-      const newShoppingList = [
-        { id: new Date().toTimeString(), name: value },
+      const newShoppingList = orderShoppingList([
+        {
+          id: new Date().toTimeString(),
+          name: value,
+          lastUpdatedTimestamp: Date.now(),
+        },
         ...shoppingListItem,
-      ];
+      ]);
       setShoppingList(newShoppingList);
       setValue("");
     }
@@ -49,6 +53,7 @@ export default function App() {
         //TODO
         return {
           ...item,
+          lastUpdatedTimestamp: Date.now(),
           completedAtTimestamp: item.completedAtTimestamp
             ? undefined
             : Date.now(),
@@ -62,7 +67,7 @@ export default function App() {
 
   return (
     <FlatList
-      data={shoppingListItem}
+      data={orderShoppingList(shoppingListItem)}
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
       stickyHeaderIndices={[0]}
@@ -108,7 +113,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colorWhite,
     // justifyContent: "center",
-    padding: 12,
+    paddingVertical: 12,
   },
   contentContainer: {
     paddingTop: 24,
