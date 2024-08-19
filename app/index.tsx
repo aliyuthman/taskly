@@ -4,24 +4,20 @@ import {
   TouchableOpacity,
   Text,
   TextInput,
+  FlatList,
 } from "react-native";
 import { theme } from "../theme";
 import { ShoppingListItem } from "../components/ShoppingListItem";
 import { Link } from "expo-router";
 import { useState } from "react";
+import { initialList } from "./initialData";
 
-// Types
+// larger listings >> 999
+const testData = new Array(1000)
+  .fill(null)
+  .map((item, index) => ({ id: String(index), name: String(index) }));
 
-type ShopingListItemType = {
-  id: string;
-  name: string;
-};
-
-const initialList: ShopingListItemType[] = [
-  { id: "1", name: "coffee" },
-  { id: "2", name: "Tea" },
-  { id: "3", name: "Milk" },
-];
+console.log(testData);
 
 export default function App() {
   const [value, setValue] = useState(""); //useState() function or hook return array of two items, first is the variable you're tracking and the second is the function to call when updating or changing the value of the first item.
@@ -41,32 +37,33 @@ export default function App() {
   };
 
   return (
-    <ScrollView
+    <FlatList
+      data={testData}
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
       stickyHeaderIndices={[0]}
-    >
-      {/* There three main methods navigating between screens using expo-route  */}
-      {/* first method to navigate - using link*/}
-      <Link href="/counter" asChild>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Go to Counter</Text>
-        </TouchableOpacity>
-      </Link>
-
-      <TextInput
-        style={styles.textInput}
-        placeholder="E.g. Coffee"
-        value={value}
-        onChangeText={setValue}
-        returnKeyType="done"
-        onSubmitEditing={handleSubmit}
-      />
-
-      {shopingListItem.map((item) => (
-        <ShoppingListItem name={item.name} key={item.id} />
-      ))}
-    </ScrollView>
+      ListHeaderComponent={() => (
+        <>
+          <Link href="/counter" asChild>
+            <TouchableOpacity style={styles.button}>
+              <Text style={styles.buttonText}>Go to Counter</Text>
+            </TouchableOpacity>
+          </Link>
+          <TextInput
+            style={styles.textInput}
+            placeholder="E.g. Coffee"
+            value={value}
+            onChangeText={setValue}
+            returnKeyType="done"
+            onSubmitEditing={handleSubmit}
+          />
+        </>
+      )}
+      renderItem={({ item }) => {
+        console.log(item); //this shows only the rendered item on screen, therefore flatlist optimized the rendering. The rest are truncated while only the visible component are renderedß
+        return <ShoppingListItem name={item.name} />;
+      }}
+    ></FlatList>
   );
 }
 
