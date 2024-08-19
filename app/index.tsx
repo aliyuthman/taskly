@@ -36,6 +36,11 @@ export default function App() {
     }
   };
 
+  const handleDelete = (id: string) => {
+    const newShopingList = shopingListItem.filter((item) => item.id !== id);
+    setShopingList(newShopingList);
+  };
+
   return (
     <FlatList
       data={shopingListItem}
@@ -66,7 +71,12 @@ export default function App() {
       }
       renderItem={({ item }) => {
         console.log(item); //this shows only the rendered item on screen, therefore flatlist optimized the rendering. The rest are truncated while only the visible component are renderedß
-        return <ShoppingListItem name={item.name} />;
+        return (
+          <ShoppingListItem
+            name={item.name}
+            onDelete={() => handleDelete(item.id)}
+          />
+        );
       }}
     ></FlatList>
   );
