@@ -1,6 +1,6 @@
 import {
   StyleSheet,
-  View,
+  ScrollView,
   TouchableOpacity,
   Text,
   TextInput,
@@ -41,7 +41,11 @@ export default function App() {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      stickyHeaderIndices={[0]}
+    >
       {/* There three main methods navigating between screens using expo-route  */}
       {/* first method to navigate - using link*/}
       <Link href="/counter" asChild>
@@ -62,7 +66,7 @@ export default function App() {
       {shopingListItem.map((item) => (
         <ShoppingListItem name={item.name} key={item.id} />
       ))}
-    </View>
+    </ScrollView>
   );
 }
 
@@ -71,7 +75,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colorWhite,
     // justifyContent: "center",
-    paddingTop: 12,
+    padding: 12,
+  },
+  contentContainer: {
+    paddingTop: 24,
   },
   button: {
     alignSelf: "center",
@@ -94,5 +101,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     fontSize: 18,
     borderRadius: 50,
+    backgroundColor: theme.colorWhite,
   },
 });
