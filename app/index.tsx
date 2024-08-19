@@ -10,9 +10,10 @@ import {
 import { theme } from "../theme";
 import { ShoppingListItem } from "../components/ShoppingListItem";
 import { Link } from "expo-router";
-import { useState } from "react";
-import { initialList, ShoppingListItemType } from "./initialData";
-import { orderShoppingList } from "./utils";
+import { useEffect, useState } from "react";
+import { initialList, ShoppingListItemType } from "../utils/inMemoryData";
+import { orderShoppingList } from "../utils/orderUtils";
+import { getFromStorage, saveToStorage } from "../utils/storage";
 
 // larger listings >> 999
 const testData = new Array(1000)
@@ -21,11 +22,24 @@ const testData = new Array(1000)
 
 console.log(testData);
 
+const storageKey = "shopping-list";
+
 export default function App() {
   const [value, setValue] = useState(""); //useState() function or hook return array of two items, first is the variable you're tracking and the second is the function to call when updating or changing the value of the first item.
 
-  const [shoppingListItem, setShoppingList] =
-    useState<ShoppingListItemType[]>(initialList);
+  const [shoppingListItem, setShoppingList] = useState<ShoppingListItemType[]>(
+    []
+  );
+
+  useEffect(() => {
+    const fetchInitial = async () => {
+      const data = await getFromStorage(storageKey);
+      if (data) {
+        setShoppingList(data);
+      }
+    };
+    fetchInitial();
+  }, []);
 
   const handleSubmit = () => {
     if (value) {
@@ -38,12 +52,14 @@ export default function App() {
         ...shoppingListItem,
       ]);
       setShoppingList(newShoppingList);
+      saveToStorage(storageKey, shoppingListItem);
       setValue("");
     }
   };
 
   const handleDelete = (id: string) => {
     const newShoppingList = shoppingListItem.filter((item) => item.id !== id);
+    saveToStorage(storageKey, shoppingListItem);
     setShoppingList(newShoppingList);
   };
 
@@ -61,7 +77,7 @@ export default function App() {
       }
       return item;
     });
-
+    saveToStorage(storageKey, shoppingListItem);
     setShoppingList(newShoppingList);
   };
 
