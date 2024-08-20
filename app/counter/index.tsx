@@ -4,6 +4,8 @@ import { theme } from "../../theme";
 import { registerForPushNotificationsAsync } from "../../utils/registerForPushNotificationsAsync";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
+import { intervalToDuration, isBefore } from "date-fns";
+import { TimeSegment } from "../../components/TimeSegment";
 
 // Set up notification handler
 Notifications.setNotificationHandler({
@@ -14,7 +16,40 @@ Notifications.setNotificationHandler({
   }),
 });
 
+// 10 seconds from now
+const timeStamp = Date.now() + 10 * 1000;
+type CountdownStatus = {
+  isOverdue: boolean;
+  distance: ReturnType<typeof intervalToDuration>;
+};
+
 export default function CounterScreen() {
+  const [status, setStatus] = useState<CountdownStatus>({
+    isOverdue: false,
+    distance: {},
+  });
+
+  // const [secondElapsed, setSecondElapsed] = useState(0);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const isOverdue = isBefore(timeStamp, Date.now());
+      const distance = intervalToDuration(
+        isOverdue
+          ? { start: timeStamp, end: Date.now() }
+          : {
+              start: Date.now(),
+              end: timeStamp,
+            }
+      );
+      setStatus({ isOverdue, distance });
+      // setSecondElapsed((val) => val + 1);
+    }, 1000);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
   const [lastNotification, setLastNotification] =
     useState<Notifications.NotificationContent | null>(null);
 
@@ -58,7 +93,43 @@ export default function CounterScreen() {
     }
   };
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        status.isOverdue ? styles.containerLate : undefined,
+      ]}
+    >
+      {/* <Text style={styles.secondText}>{secondElapsed}</Text> */}
+
+      {status.isOverdue ? (
+        <Text style={[styles.heading, styles.whiteText]}>Thing overdue by</Text>
+      ) : (
+        <Text style={styles.heading}>Thing due in</Text>
+      )}
+
+      <View style={styles.timer}>
+        {/* <TimeSegment unit="Months" number={status.distance.months ?? 0} /> */}
+        <TimeSegment
+          unit="Days"
+          number={status.distance.days ?? 0}
+          textStyle={status.isOverdue ? styles.whiteText : undefined}
+        />
+        <TimeSegment
+          unit="Hours"
+          number={status.distance.hours ?? 0}
+          textStyle={status.isOverdue ? styles.whiteText : undefined}
+        />
+        <TimeSegment
+          unit="Mintes"
+          number={status.distance.minutes ?? 0}
+          textStyle={status.isOverdue ? styles.whiteText : undefined}
+        />
+        <TimeSegment
+          unit="Seconds"
+          number={status.distance.seconds ?? 0}
+          textStyle={status.isOverdue ? styles.whiteText : undefined}
+        />
+      </View>
       <TouchableOpacity
         style={styles.button}
         activeOpacity={0.8}
@@ -66,7 +137,7 @@ export default function CounterScreen() {
       >
         <Text style={styles.buttonText}>Schedule notification</Text>
       </TouchableOpacity>
-      <Text style={styles.text}>Counter</Text>
+      <Text style={[styles.heading, styles.whiteText]}>Counter</Text>
       {lastNotification && (
         <View style={styles.notificationInfo}>
           <Text style={styles.notificationTitle}>🕹️ Last Notification:</Text>
@@ -85,17 +156,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#fff",
   },
-  text: {
-    fontSize: 24,
-  },
 
   button: {
     alignSelf: "center",
     marginBottom: 18,
-    backgroundColor: theme.colorOrange,
+    backgroundColor: theme.colorBlack,
     paddingVertical: 12,
     paddingHorizontal: 20,
-    borderRadius: 12,
+    borderRadius: 8,
   },
   buttonText: {
     color: theme.colorWhite,
@@ -112,5 +180,24 @@ const styles = StyleSheet.create({
   notificationTitle: {
     fontWeight: "bold",
     marginBottom: 5,
+  },
+  // secondText: {
+  //   fontSize: 96,
+  // },
+  timer: {
+    flexDirection: "row",
+    marginBottom: 24,
+  },
+  heading: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 24,
+  },
+  containerLate: {
+    backgroundColor: theme.colorRed,
+  },
+
+  whiteText: {
+    color: theme.colorWhite,
   },
 });
