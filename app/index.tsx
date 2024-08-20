@@ -1,6 +1,5 @@
 import {
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   Text,
   TextInput,
@@ -12,7 +11,7 @@ import { theme } from "../theme";
 import { ShoppingListItem } from "../components/ShoppingListItem";
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
-import { initialList, ShoppingListItemType } from "../utils/inMemoryData";
+import { ShoppingListItemType } from "../utils/inMemoryData";
 import { orderShoppingList } from "../utils/orderUtils";
 import { getFromStorage, saveToStorage } from "../utils/storage";
 import * as Haptics from "expo-haptics";
