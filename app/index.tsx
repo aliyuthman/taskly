@@ -6,6 +6,7 @@ import {
   TextInput,
   FlatList,
   View,
+  LayoutAnimation,
 } from "react-native";
 import { theme } from "../theme";
 import { ShoppingListItem } from "../components/ShoppingListItem";
@@ -20,7 +21,7 @@ const testData = new Array(1000)
   .fill(null)
   .map((item, index) => ({ id: String(index), name: String(index) }));
 
-console.log(testData);
+// console.log(testData);
 
 const storageKey = "shopping-list";
 
@@ -35,6 +36,7 @@ export default function App() {
     const fetchInitial = async () => {
       const data = await getFromStorage(storageKey);
       if (data) {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
         setShoppingList(data);
       }
     };
@@ -51,6 +53,7 @@ export default function App() {
         },
         ...shoppingListItem,
       ]);
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       setShoppingList(newShoppingList);
       saveToStorage(storageKey, shoppingListItem);
       setValue("");
@@ -60,6 +63,7 @@ export default function App() {
   const handleDelete = (id: string) => {
     const newShoppingList = shoppingListItem.filter((item) => item.id !== id);
     saveToStorage(storageKey, shoppingListItem);
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setShoppingList(newShoppingList);
   };
 
@@ -78,6 +82,7 @@ export default function App() {
       return item;
     });
     saveToStorage(storageKey, shoppingListItem);
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setShoppingList(newShoppingList);
   };
 
@@ -110,7 +115,7 @@ export default function App() {
         </>
       }
       renderItem={({ item }) => {
-        console.log(item); //this shows only the rendered item on screen, therefore flatlist optimized the rendering. The rest are truncated while only the visible component are renderedß
+        // console.log(item); //this shows only the rendered item on screen, therefore flatlist optimized the rendering. The rest are truncated while only the visible component are renderedß
         return (
           <ShoppingListItem
             name={item.name}

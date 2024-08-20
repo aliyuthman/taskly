@@ -7,6 +7,7 @@ import {
   Pressable,
   Text,
   View,
+ 
 } from "react-native";
 import { AntDesign, Entypo } from "@expo/vector-icons";
 
