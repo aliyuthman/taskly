@@ -15,6 +15,7 @@ import { useEffect, useState } from "react";
 import { initialList, ShoppingListItemType } from "../utils/inMemoryData";
 import { orderShoppingList } from "../utils/orderUtils";
 import { getFromStorage, saveToStorage } from "../utils/storage";
+import * as Haptics from "expo-haptics";
 
 // larger listings >> 999
 const testData = new Array(1000)
@@ -64,13 +65,18 @@ export default function App() {
     const newShoppingList = shoppingListItem.filter((item) => item.id !== id);
     saveToStorage(storageKey, shoppingListItem);
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setShoppingList(newShoppingList);
   };
 
   const handleToggleComplete = (id: string) => {
     const newShoppingList = shoppingListItem.map((item) => {
       if (item.id === id) {
-        //TODO
+        if (item.completedAtTimestamp) {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        } else {
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        }
         return {
           ...item,
           lastUpdatedTimestamp: Date.now(),
