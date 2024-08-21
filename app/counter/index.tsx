@@ -27,9 +27,9 @@ Notifications.setNotificationHandler({
 // 10 seconds from now
 const frequency = 10 * 1000; //hardcode
 
-const countdownStorageKey = "taskly-countdown";
+export const countdownStorageKey = "taskly-countdown";
 
-type PersistedCountDownState = {
+export type PersistedCountDownState = {
   currentNotificationId: string | undefined;
   completedAtTimestamps: number[];
 };
