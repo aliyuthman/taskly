@@ -1,31 +1,47 @@
 import {
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   Text,
   TextInput,
   FlatList,
   View,
+  LayoutAnimation,
 } from "react-native";
 import { theme } from "../theme";
 import { ShoppingListItem } from "../components/ShoppingListItem";
 import { Link } from "expo-router";
-import { useState } from "react";
-import { initialList, ShoppingListItemType } from "./initialData";
-import { orderShoppingList } from "./utils";
+import { useEffect, useState } from "react";
+import { ShoppingListItemType } from "../utils/inMemoryData";
+import { orderShoppingList } from "../utils/orderUtils";
+import { getFromStorage, saveToStorage } from "../utils/storage";
+import * as Haptics from "expo-haptics";
 
 // larger listings >> 999
 const testData = new Array(1000)
   .fill(null)
   .map((item, index) => ({ id: String(index), name: String(index) }));
 
-console.log(testData);
+// console.log(testData);
+
+const storageKey = "shopping-list";
 
 export default function App() {
   const [value, setValue] = useState(""); //useState() function or hook return array of two items, first is the variable you're tracking and the second is the function to call when updating or changing the value of the first item.
 
-  const [shoppingListItem, setShoppingList] =
-    useState<ShoppingListItemType[]>(initialList);
+  const [shoppingListItem, setShoppingList] = useState<ShoppingListItemType[]>(
+    []
+  );
+
+  useEffect(() => {
+    const fetchInitial = async () => {
+      const data = await getFromStorage(storageKey);
+      if (data) {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        setShoppingList(data);
+      }
+    };
+    fetchInitial();
+  }, []);
 
   const handleSubmit = () => {
     if (value) {
@@ -37,20 +53,29 @@ export default function App() {
         },
         ...shoppingListItem,
       ]);
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       setShoppingList(newShoppingList);
+      saveToStorage(storageKey, shoppingListItem);
       setValue("");
     }
   };
 
   const handleDelete = (id: string) => {
     const newShoppingList = shoppingListItem.filter((item) => item.id !== id);
+    saveToStorage(storageKey, shoppingListItem);
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setShoppingList(newShoppingList);
   };
 
   const handleToggleComplete = (id: string) => {
     const newShoppingList = shoppingListItem.map((item) => {
       if (item.id === id) {
-        //TODO
+        if (item.completedAtTimestamp) {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        } else {
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        }
         return {
           ...item,
           lastUpdatedTimestamp: Date.now(),
@@ -61,7 +86,8 @@ export default function App() {
       }
       return item;
     });
-
+    saveToStorage(storageKey, shoppingListItem);
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setShoppingList(newShoppingList);
   };
 
@@ -94,7 +120,7 @@ export default function App() {
         </>
       }
       renderItem={({ item }) => {
-        console.log(item); //this shows only the rendered item on screen, therefore flatlist optimized the rendering. The rest are truncated while only the visible component are renderedß
+        // console.log(item); //this shows only the rendered item on screen, therefore flatlist optimized the rendering. The rest are truncated while only the visible component are renderedß
         return (
           <ShoppingListItem
             name={item.name}

@@ -1,4 +1,4 @@
-import { ShoppingListItemType } from "./initialData";
+import { ShoppingListItemType } from "./inMemoryData";
 
 export function orderShoppingList(shoppingList: ShoppingListItemType[]) {
   return shoppingList.sort((item1, item2) => {
