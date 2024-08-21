@@ -1,11 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { Text, View, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import {
+  Text,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import { theme } from "../../theme";
 import { registerForPushNotificationsAsync } from "../../utils/registerForPushNotificationsAsync";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import { intervalToDuration, isBefore } from "date-fns";
 import { TimeSegment } from "../../components/TimeSegment";
+import { getFromStorage, saveToStorage } from "../../utils/storage";
 
 // Set up notification handler
 Notifications.setNotificationHandler({
@@ -17,22 +25,49 @@ Notifications.setNotificationHandler({
 });
 
 // 10 seconds from now
-const timeStamp = Date.now() + 10 * 1000;
+const frequency = 10 * 1000; //hardcode
+
+const countdownStorageKey = "taskly-countdown";
+
+type PersistedCountDownState = {
+  currentNotificationId: string | undefined;
+  completedAtTimestamps: number[];
+};
+
 type CountdownStatus = {
   isOverdue: boolean;
   distance: ReturnType<typeof intervalToDuration>;
 };
 
 export default function CounterScreen() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [countdownState, setCountdownState] =
+    useState<PersistedCountDownState>();
   const [status, setStatus] = useState<CountdownStatus>({
     isOverdue: false,
     distance: {},
   });
 
+  const lastCompletedTimestamp = countdownState?.completedAtTimestamps[0];
+
+  useEffect(() => {
+    const init = async () => {
+      const value = await getFromStorage(countdownStorageKey);
+      setCountdownState(value);
+    };
+    init();
+  }, []);
+
   // const [secondElapsed, setSecondElapsed] = useState(0);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
+      const timeStamp = lastCompletedTimestamp
+        ? lastCompletedTimestamp + frequency
+        : Date.now();
+      if (lastCompletedTimestamp) {
+        setIsLoading(false);
+      }
       const isOverdue = isBefore(timeStamp, Date.now());
       const distance = intervalToDuration(
         isOverdue
@@ -49,7 +84,7 @@ export default function CounterScreen() {
     return () => {
       clearInterval(intervalId);
     };
-  }, []);
+  }, [lastCompletedTimestamp]);
   const [lastNotification, setLastNotification] =
     useState<Notifications.NotificationContent | null>(null);
 
@@ -71,16 +106,17 @@ export default function CounterScreen() {
   }, []);
 
   const scheduleNotification = async () => {
+    let pushNotificationId;
     const result = await registerForPushNotificationsAsync();
     if (result === "granted") {
       console.log(result);
-      await Notifications.scheduleNotificationAsync({
+      pushNotificationId = await Notifications.scheduleNotificationAsync({
         content: {
           title: "Foreground Notification Test",
           body: "This notification was received while the app was open!",
         },
         trigger: {
-          seconds: 5,
+          seconds: frequency / 1000,
         },
       });
     } else {
@@ -91,7 +127,30 @@ export default function CounterScreen() {
         );
       }
     }
+
+    if (countdownState?.currentNotificationId) {
+      await Notifications.cancelScheduledNotificationAsync(
+        countdownState?.currentNotificationId
+      );
+    }
+
+    const newCountdownState: PersistedCountDownState = {
+      currentNotificationId: pushNotificationId,
+      completedAtTimestamps: countdownState
+        ? [Date.now(), ...countdownState.completedAtTimestamps]
+        : [Date.now()],
+    };
+    setCountdownState(newCountdownState);
+    await saveToStorage(countdownStorageKey, newCountdownState);
   };
+
+  if (isLoading) {
+    return (
+      <View style={styles.activityIndicatorContainer}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
   return (
     <View
       style={[
@@ -135,7 +194,7 @@ export default function CounterScreen() {
         activeOpacity={0.8}
         onPress={scheduleNotification}
       >
-        <Text style={styles.buttonText}>Schedule notification</Text>
+        <Text style={styles.buttonText}>I've done the thing!</Text>
       </TouchableOpacity>
       <Text style={[styles.heading, styles.whiteText]}>Counter</Text>
       {lastNotification && (
@@ -199,5 +258,12 @@ const styles = StyleSheet.create({
 
   whiteText: {
     color: theme.colorWhite,
+  },
+
+  activityIndicatorContainer: {
+    backgroundColor: theme.colorWhite,
+    justifyContent: "center",
+    alignItems: "center",
+    flex: 1,
   },
 });
